@@ -1,0 +1,114 @@
+# Javascript Node CircleCI 2.0 configuration file
+#
+# Check https://circleci.com/docs/2.0/language-javascript/ for more details
+#
+version: 2
+jobs:
+  build-and-test:
+    docker:
+      # specify the version you desire here
+      - image: circleci/node:8.12.0
+      
+      # Specify service dependencies here if necessary
+      # CircleCI maintains a library of pre-built images
+      # documented at https://circleci.com/docs/2.0/circleci-images/
+      - image: circleci/mysql:5.7
+        command: mysqld --sql-mode="STRICT_TRANS_TABLES,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION"
+        environment:
+          MYSQL_RANDOM_ROOT_PASSWORD: yes
+          MYSQL_DATABASE: medlor_test
+          MYSQL_USER: server
+          MYSQL_PASSWORD: 3vpiVis1
+    
+    working_directory: ~/repo
+
+    steps:
+      - checkout
+      
+      # Download and cache dependencies
+      - restore_cache:
+          keys:
+          - v1-dependencies-{{ checksum "package.json" }}
+          # fallback to using the latest cache if no exact match is found
+          - v1-dependencies-
+
+      - run:
+          name: Authenticating to NPM
+          command: echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > ~/.npmrc
+      - run:
+          name: Check for version patch
+          command: |
+            if [ "${PATCH_VERSION}" == "true" ]; then
+              npm --no-git-tag-version version patch
+            fi
+      - run:
+          name: Upgrade and Install
+          command: |
+            yarn install
+            yarn upgrade @medlor/medlor-auth-token-lib@latest
+            yarn build
+
+      - save_cache:
+          paths:
+            - node_modules
+          key: v1-dependencies-{{ checksum "package.json" }}
+        
+      # get server up and running in the background
+      - run:
+          name: Launching server for tests
+          command: yarn test:server:reset
+          background: true
+      # wait for the server to start responding. We expect Bad Request 400 once it starts listening.
+      # so override the shell and have the last command be the : { null } command to force exit code 0.
+      - run:
+          name: Awaiting server spin up
+          shell: /bin/sh
+          command: |
+            wget --retry-connrefused --waitretry=1 --read-timeout=20 --timeout=15 -t 10 http://localhost:3050/graphql
+            :
+      - run:
+          name: Run Tests
+          command: yarn test
+      - run:
+          name: Commit upgrades to git
+          command: |
+            git config user.email "chad@medlor.com"
+            git config user.name "chadacious"
+            git add -A
+            git diff-index --quiet HEAD || git commit -m "circleci deploy [skip ci]"
+            git push origin master
+
+      - persist_to_workspace:
+          root: ~/repo
+          paths: .
+
+  docker-image:
+    machine: true
+    working_directory: ~/repo
+    steps:
+      - attach_workspace:
+          at: ~/repo
+      - run:
+          name: "Get package.json version"
+          command: |
+            echo export PACKAGE_VERSION=$(eval node -p "require\(\'./package.json\'\).version") >> $BASH_ENV
+      - run: echo ${PACKAGE_VERSION}
+      - run:
+          name: docker-image
+          command: |
+            TAG=${PACKAGE_VERSION}.${CIRCLE_BUILD_NUM}
+            IMAGE=sirs/${CIRCLE_PROJECT_REPONAME}
+            docker build -t $IMAGE:$TAG . --build-arg NPM_TOKEN=$NPM_TOKEN
+            docker login $DOCKER_REGISTRY -u $DOCKER_REGISTRY_USER -p $DOCKER_REGISTRY_PASSWORD
+            docker push $IMAGE:$TAG
+      - run:
+          name: Remove Version Patch Environment Variable
+          command: curl -X DELETE https://circleci.com/api/v1.1/project/github/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}/envvar/PATCH_VERSION?circle-token=${CIRCLECI_TOKEN}
+workflows:
+  version: 2
+  build-and-test_docker-image:
+    jobs:
+      - build-and-test
+      - docker-image:
+          requires:
+            - build-and-test

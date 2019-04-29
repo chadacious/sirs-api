@@ -1,0 +1,44 @@
+scalar DATE
+scalar JSON
+
+type SIRScale {
+    # System assigned identifier
+    id: Int
+    filterTypeId: Int
+    version: String
+    description: String
+    createdAt: DATE
+    updatedAt: DATE
+    ok: Boolean!
+    errors: [Error!]
+}
+
+type SIRScaleDefinition {
+    # System assigned identifier
+    id: Int
+    filterTypeId: Int
+    version: String
+    description: String
+    jsonDefinition: JSON
+    createdAt: DATE
+    updatedAt: DATE
+    ok: Boolean!
+    errors: [Error!]
+}
+
+input SIRScaleVersionInput {
+    filterTypeId: Int
+    version: String
+    description: String
+    jsonDefinition: JSON
+    publishedAt: DATE
+}
+
+type Mutation {
+    upsertSIRScaleVersion(id: Int, sirScaleVersionInput: SIRScaleVersionInput!): SimpleResponse!
+}
+
+type Query {
+    getSIRScaleVersions(filterTypeId: Int!): [SIRScale]
+    loadSIRScaleDefinition(id: Int!): SIRScaleDefinition
+}

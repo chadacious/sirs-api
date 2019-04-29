@@ -1,0 +1,39 @@
+{
+    "development": {
+      "username": "server",
+      "password": null,
+      "database": "medlor",
+      "host": "127.0.0.1",
+      "dialect": "mysql",
+      "dialectOptions": {
+        "multipleStatements": true
+      }
+    },
+    "test": {
+      "username": "server",
+      "password": "3vpiVis1",
+      "database": "medlor_test",
+      "host": "127.0.0.1",
+      "dialect": "mysql",
+      "dialectOptions": {
+        "multipleStatements": true
+      }    
+    },
+    "production": {
+      "username": null,
+      "password": null,
+      "database": "medlor",
+      "host": null,
+      "dialect": "mysql",
+      "dialectOptions": {
+        "multipleStatements": true
+      },
+      "replication": {
+        "read": [
+          { "host": "medlor-read", "username": "server" }
+        ],
+        "write": { "host": "mysql-0.mysql", "username": "server" }
+      }
+    }
+  }
+  

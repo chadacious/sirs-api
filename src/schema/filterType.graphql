@@ -1,0 +1,14 @@
+type FilterType {
+    # System assigned identifier
+    id: Int
+    code: String
+    name: String
+    description: String
+    ok: Boolean!
+    errors: [Error!]
+}
+
+type Query {
+    # Simple query to pull filter types.
+    allFilterTypes: [FilterType]
+}

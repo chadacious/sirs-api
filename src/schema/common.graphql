@@ -1,0 +1,10 @@
+type Error {
+    path: String!
+    message: String
+}
+
+type SimpleResponse {
+    ok: Boolean!
+    id: Int
+    errors: [Error!]
+}

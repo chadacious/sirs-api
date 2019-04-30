@@ -53,7 +53,7 @@ function createPackageFile() {
             } = packageData;
 
             const minimalPackage = {
-                name: '@medlor/sirscale-api',
+                name: 'sirs-api',
                 author,
                 version,
                 description,

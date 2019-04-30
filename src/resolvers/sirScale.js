@@ -3,7 +3,7 @@ import {
     tryLoadSIRScaleDefinition,
     tryUpsertSIRScaleVersion,
 } from './sirScaleLogic/sirScale';
-import requiresAuth from '../utils/checkAuthenticated';
+// import requiresAuth from '../utils/checkAuthenticated';
 
 export default {
     Query: {
@@ -11,7 +11,9 @@ export default {
         loadSIRScaleDefinition: (parent, { id }, { models, user }) => tryLoadSIRScaleDefinition(id, models, user),
     },
     Mutation: {
-        upsertSIRScaleVersion: requiresAuth.createResolver(async (parent, { id, sirScaleVersionInput }, { models, user }) =>
-            tryUpsertSIRScaleVersion(id, sirScaleVersionInput, models, user)),
+        upsertSIRScaleVersion: (parent, { id, sirScaleVersionInput }, { models, user }) =>
+            tryUpsertSIRScaleVersion(id, sirScaleVersionInput, models, user),
+        // upsertSIRScaleVersion: requiresAuth.createResolver(async (parent, { id, sirScaleVersionInput }, { models, user }) =>
+        //     tryUpsertSIRScaleVersion(id, sirScaleVersionInput, models, user)),
     },
 };

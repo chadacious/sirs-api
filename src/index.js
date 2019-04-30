@@ -82,6 +82,7 @@ getModels().then((models) => {
     server.applyMiddleware({
         app,
         path: graphqlEndpoint,
+        bodyParserConfig: { limit: '50mb' },
         cors: {
             origin: (origin, callback) => {
                 // allow requests with no origin (like mobile apps or curl requests)

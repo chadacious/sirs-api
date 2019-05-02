@@ -5,6 +5,7 @@ export default (sequelize, DataTypes) => {
         filterTypeId: DataTypes.INTEGER,
         version: DataTypes.STRING,
         description: DataTypes.STRING,
+        serializedDiagram: DataTypes.JSON,
         jsonDefinition: DataTypes.JSON,
         publishedAt: DataTypes.DATE,
         deletedAt: {

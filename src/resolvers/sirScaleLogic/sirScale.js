@@ -46,6 +46,7 @@ export const tryUpsertSIRScaleVersion = async (id, sirScaleVersionInput, models,
             version,
             description,
             jsonDefinition,
+            serializedDiagram,
             publishedAt,
         } = sirScaleVersionInput;
 
@@ -56,6 +57,7 @@ export const tryUpsertSIRScaleVersion = async (id, sirScaleVersionInput, models,
                 version,
                 description,
                 jsonDefinition,
+                serializedDiagram,
                 publishedAt,
             });
             if (res[0] === 0) {
@@ -68,11 +70,12 @@ export const tryUpsertSIRScaleVersion = async (id, sirScaleVersionInput, models,
                 };
             }
         } else {
-            const cols = { jsonDefinition };
-            if (filterTypeId) cols.filterTypeId = filterTypeId;
+            const cols = { serializedDiagram };
             if (version) cols.version = version;
             if (description) cols.description = description;
             if (publishedAt) cols.publishedAt = publishedAt;
+            if (filterTypeId) cols.filterTypeId = filterTypeId;
+            if (jsonDefinition) cols.jsonDefinition = jsonDefinition;
             await models.SIRScale.update(cols, { where: { id } });
         }
         return { ok: true, id: res.dataValues.id };

@@ -9,6 +9,7 @@ type SIRScale {
     description: String
     createdAt: DATE
     updatedAt: DATE
+    publishedAt: DATE
     ok: Boolean!
     errors: [Error!]
 }
@@ -20,6 +21,8 @@ type SIRScaleDefinition {
     version: String
     description: String
     jsonDefinition: JSON
+    serializedDiagram: JSON
+    publishedAt: DATE
     createdAt: DATE
     updatedAt: DATE
     ok: Boolean!
@@ -31,6 +34,7 @@ input SIRScaleVersionInput {
     version: String
     description: String
     jsonDefinition: JSON
+    serializedDiagram: JSON
     publishedAt: DATE
 }
 

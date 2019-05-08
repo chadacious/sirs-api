@@ -18,7 +18,7 @@ describe('filterType resolves', () => {
             data: {
                 getUserDetail: {
                     id: 1,
-                    email: 'VIOLENT_CONTENT',
+                    code: 'VIOLENT_CONTENT',
                 },
             },
         });

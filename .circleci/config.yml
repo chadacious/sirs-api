@@ -99,7 +99,7 @@ jobs:
             TAG=${PACKAGE_VERSION}.${CIRCLE_BUILD_NUM}
             IMAGE=sirs/${CIRCLE_PROJECT_REPONAME}
             docker build -t $IMAGE:$TAG . --build-arg NPM_TOKEN=$NPM_TOKEN
-            docker login $DOCKER_REGISTRY -u $DOCKER_REGISTRY_USER -p $DOCKER_REGISTRY_PASSWORD
+            docker login -u $DOCKER_REGISTRY_USER -p $DOCKER_REGISTRY_PASSWORD
             docker push $IMAGE:$TAG
       - run:
           name: Remove Version Patch Environment Variable
